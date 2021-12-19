@@ -25,18 +25,30 @@ namespace FilmApi.Controllers
                this.movieRepository = movieRepository;
           }
 
-          [HttpGet("/api/movie")]
-          public IActionResult List(bool? asc = false)
+          [HttpGet("/api/movies")]
+          public IActionResult List(bool? asc = false, Category? category = null, int limit = 10)
           {
                try
                {
-                    if (asc == true)
+
+                    IEnumerable<Movie> movies;
+
+                    if (category != null)
                     {
-                         return Ok(movieRepository.List().OrderBy(movie => movie.Rating));
+                         movies = movieRepository.Find(m => m.Category == category);
                     }
                     else
                     {
-                         return Ok(movieRepository.List().OrderByDescending(movie => movie.Rating));
+                         movies = movieRepository.List().Take(limit);
+                    }
+
+                    if (asc == true)
+                    {
+                         return Ok(movies.OrderBy(m => m.Rating).Take(limit));
+                    }
+                    else
+                    {
+                         return Ok(movies.OrderByDescending(m => m.Rating).Take(limit));
                     }
                }
                catch (Exception ex)
@@ -51,8 +63,9 @@ namespace FilmApi.Controllers
           {
                try
                {
-                    Movie existingMovieByName =
-                                   movieRepository.Find(m => m.Title.Equals(movie.Title, StringComparison.InvariantCultureIgnoreCase));
+                    var existingMovie = movieRepository
+                         .Find(m => m.Title.Equals(movie.Title, StringComparison.InvariantCultureIgnoreCase))
+                         .FirstOrDefault();
 
 
                     if (movieRepository.Get(id) == null)
@@ -60,7 +73,7 @@ namespace FilmApi.Controllers
                          return BadRequest($"movie id {id} not found");
                     }
 
-                    if (existingMovieByName != null && existingMovieByName.Id != id)
+                    if (existingMovie != null && existingMovie.Id != id)
                     {
                          return BadRequest("Movie with same title already found");
                     }
@@ -171,10 +184,11 @@ namespace FilmApi.Controllers
 
           private bool TitleExists(string title)
           {
-               Movie existingMovieByName =
-                                 movieRepository.Find(m => m.Title.Equals(title, StringComparison.InvariantCultureIgnoreCase));
+               var existingMovie = movieRepository
+                        .Find(m => m.Title.Equals(title, StringComparison.InvariantCultureIgnoreCase))
+                        .FirstOrDefault();
 
-               return existingMovieByName != null;
+               return existingMovie != null;
           }
      }
 }

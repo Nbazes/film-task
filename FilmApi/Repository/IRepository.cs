@@ -11,7 +11,7 @@ namespace FilmApi.Repository
           void Update(int id, T item);
           T Get(int id);
           void Delete(int id);
-          T Find(Func<T, bool> find);
+          IEnumerable<T> Find(Func<T, bool> find);
           IEnumerable<T> List();
      }
 }

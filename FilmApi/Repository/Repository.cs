@@ -32,11 +32,11 @@ namespace FilmApi.Repository
 
           }
 
-          public virtual T Find(Func<T, bool> find)
+          public virtual IEnumerable<T> Find(Func<T, bool> find)
           {
-               T item = _items.FirstOrDefault(i => find(i));
+               IEnumerable<T> items = _items.Where(i => find(i));
 
-               return item;
+               return items;
           }
 
           public virtual T Get(int id)
@@ -107,7 +107,7 @@ namespace FilmApi.Repository
                     Directory.CreateDirectory(path);
                }
 
-               File.WriteAllText(path, json);
+               File.WriteAllText(Path.Combine(path, "data.json"), json);
           }
 
           private void LoadFile()
@@ -135,8 +135,13 @@ namespace FilmApi.Repository
 
 
                string path = Path.Combine(Environment.CurrentDirectory, directoryName);
+               string fullPath = Path.Combine(path, "data.json");
+               
+               if(File.Exists(fullPath) == false) {
+                    return;
+               }
 
-               string data = File.ReadAllText(path);
+               string data = File.ReadAllText(fullPath);
 
                _items = JsonConvert.DeserializeObject<List<T>>(data,
                                   new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.All });

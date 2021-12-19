@@ -13,15 +13,21 @@ namespace FilmApi.Models
 
           [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
           public int? Id { get; set; }
-          
+
           [Required]
           public string? Title { get; set; }
 
           [Required]
           public int? Rating { get; set; }
-          
+
           [Required]
           public Category? Category { get; set; }
+
+          [Required]
+          public string BackgroundUrl { get; set; }
+
+
+
      }
 
 }

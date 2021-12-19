@@ -31,6 +31,7 @@ namespace FilmApi
           // This method gets called by the runtime. Use this method to add services to the container.
           public void ConfigureServices(IServiceCollection services)
           {
+               services.AddCors(cors => cors.AddPolicy("AllowAll", options => options.AllowAnyOrigin().AllowAnyMethod()));
                services.AddSingleton<List<Movie>>(new List<Movie>());
                services.AddScoped<IRepository<Movie>, MovieRepository>();
 
@@ -52,12 +53,17 @@ namespace FilmApi
           // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
           public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
           {
+
                if (env.IsDevelopment())
                {
                     app.UseDeveloperExceptionPage();
                     app.UseSwagger();
                     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "FilmApi v1"));
                }
+
+               app.UseCors("AllowAll");
+
+
 
                app.UseHttpsRedirection();
 
